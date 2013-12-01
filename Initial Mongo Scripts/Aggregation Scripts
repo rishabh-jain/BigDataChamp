@@ -14,3 +14,9 @@ db.ItemEntityWithDescription.aggregate([
 
 db.ItemEntityWithDescription.aggregate([
 	{ $match : { Item.ListingDetails.StartTime : { $gte : ISODate("2013-08-25T00:00:00.000Z"), $lt : ISODate("2013-08-26T00:00:00.000Z") } } } ])
+
+
+
+/* Aggregate and get all the Titles of the various orders by a particular buyer*/
+db.OrderEntity.aggregate([
+	{ $project : { BuyerID : "$Order.BuyerUserID", ItemArray : "$Order.TransactionArray", CityName : "$Order.ShippingAddress.CityName", StateName : "$Order.ShippingAddress.StateOrProvince", Country : "$Order.ShippingAddress.CountryName" } }, { $unwind : "$ItemArray" }, { $group : { _id : "$BuyerID", items : { $addToSet : "$ItemArray.Item.Title" } } } ])
